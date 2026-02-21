@@ -22,3 +22,4 @@ export const forwardAuthenticated = (req: Request, res: Response, next: NextFunc
     }
     res.redirect("/dashboard");
 }
+

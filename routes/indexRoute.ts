@@ -12,4 +12,16 @@ router.get("/dashboard", ensureAuthenticated, (req, res) => {
   });
 });
 
+router.get('/admin/dashboard', (req, res) => {
+  const user = req.user
+  const session = (req.session as any).passport
+  const isAdmin = user?.role === "admin"
+  if(!isAdmin) {
+    throw new Error('You are not an admin.')
+  }
+  res.render('adminDash.ejs', { session, user: req.user })
+})
+
 export default router;
+
+
