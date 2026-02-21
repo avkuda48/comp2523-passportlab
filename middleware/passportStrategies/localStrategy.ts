@@ -1,8 +1,7 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
-import { getUserByEmailIdAndPassword, getUserById} from "../../controllers/userController";
+import { getUserById} from "../../controllers/userController";
 import { PassportStrategy } from '../../interfaces/index';
-import { user } from "../../classes/userClass";
 import { userModel } from "../../models/userModel";
 
 const localStrategy = new LocalStrategy(
@@ -11,30 +10,29 @@ const localStrategy = new LocalStrategy(
     passwordField: "password",
   },
   (email: string, password: string, done: any) => {
-    const user = getUserByEmailIdAndPassword(email, password)
+    const user = userModel.findOne(email)
     if(!user){
-      return done(null, false, {message: "User does not exist"})
+      return done(null, false, { message: "User does not exist" })
     }
     const isPasswordValid = user.password === password;
     if (!isPasswordValid) {
       return done(null, false, { message: "Incorrect password" });
     }
-
     return done(null, user);
   }
 );
 
 /*
-FIX ME (types) 😭
+FIX ME (types) 😭 ✅
 */
-passport.serializeUser(function (user:user, done:Function) {
+passport.serializeUser(function (user, done) {
   done(null, user.id);
 });
 
 /*
 FIX ME (types) 😭
 */
-passport.deserializeUser(function (id: number, done: Function) {
+passport.deserializeUser(function (id: number, done) {
   let user = getUserById(id);
   if (user) {
     done(null, user);

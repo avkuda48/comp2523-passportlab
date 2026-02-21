@@ -6,10 +6,10 @@ import { userModel, database } from "../models/userModel";
 const router = express.Router();
 
 router.get("/login", forwardAuthenticated, (req, res) => {
-  //read and kill the messages??? 
-  const messages = req.session.messages || [];
-  res.render("login", {messages: req.session.messages});
-  req.session.messages = [];
+
+  let messages = (req.session as any).messages || [] //how to kill the session???
+  res.render("login", { messages });
+  (req.session as any) = []
 })
 
 router.post(
@@ -40,7 +40,8 @@ router.post("/register", (req, res) => {
     id:Date.now(),
     name: name,
     email: email,
-    password: password
+    password: password,
+    role: "user"
   })
   res.redirect("/auth/login")
 })
@@ -52,5 +53,14 @@ router.get("/logout", (req, res) => {
   });
   res.redirect("/auth/login");
 });
+
+router.get('/github',
+  passport.authenticate('github', { scope: [ 'user:email' ] }));
+
+router.get('/github/callback', 
+  passport.authenticate('github', { failureRedirect: '/auth/login' }),
+  function(req, res) {
+    res.redirect('/dashboard');
+  });
 
 export default router;
